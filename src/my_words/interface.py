@@ -1,14 +1,5 @@
 import flet as ft
-
-a = [
-  "that",
-  "have",
-  "vikendi",
-  "then",
-  "surprise",
-  "can"
-]
-b = []
+from my_w import Words
 
 
 def main(page: ft.Page):
@@ -22,16 +13,15 @@ def main(page: ft.Page):
         word = e.control.content.value
         if e.control.bgcolor == color_of_not_selected:
             e.control.bgcolor = color_of_selected
-            a.remove(word)
-            b.append(word)
+            words.new_words.remove(word)
+            words.my_words.add(word)
         else:
             e.control.bgcolor = color_of_not_selected
-            b.remove(word)
-            a.append(word)
-        print(a, b)
+            words.my_words.remove(word)
+            words.new_words.add(word)
         page.update()
 
-    for i in a:
+    for i in words.new_words:
         r.controls.append(
             ft.Container(
                 ft.Text(i),
@@ -48,4 +38,8 @@ def main(page: ft.Page):
 
 
 if __name__ == '__main__':
+    video_id = 'Dn33_uncuzk'
+    words = Words('Max')
+    words.check_from_sub(video_id)
     ft.app(target=main)
+    words.write_data()
