@@ -1,45 +1,49 @@
 import flet as ft
-from my_w import Words
 
 
-def main(page: ft.Page):
+class Words_chose(ft.Row):
     color_of_selected = ft.colors.AMBER_500
     color_of_not_selected = ft.colors.AMBER_100
-    page.title = "GridView Example"
-    r = ft.Row(wrap=True, scroll="always", expand=True)
-    page.add(r)
 
-    def container_click(e: ft.ContainerTapEvent):
+    def __init__(self, words, page):
+        self.words = words
+        self.page = page
+        super().__init__()
+        self.wrap = True
+        self.scroll = "always"
+        self.expand = True
+        self.click = self.container_click
+
+    def container_click(self, e: ft.ContainerTapEvent):
         word = e.control.content.value
-        if e.control.bgcolor == color_of_not_selected:
-            e.control.bgcolor = color_of_selected
-            words.new_words.remove(word)
-            words.my_words.add(word)
-        else:
-            e.control.bgcolor = color_of_not_selected
-            words.my_words.remove(word)
-            words.new_words.add(word)
-        page.update()
 
-    for i in words.new_words:
-        r.controls.append(
-            ft.Container(
-                ft.Text(i),
-                width=100,
-                height=50,
-                alignment=ft.alignment.center,
-                bgcolor=ft.colors.AMBER_100,
-                border=ft.border.all(1, ft.colors.AMBER_400),
-                border_radius=ft.border_radius.all(5),
-                on_click=container_click,
+        if e.control.bgcolor == self.color_of_not_selected:
+            e.control.bgcolor = self.color_of_selected
+            self.words.new_words.remove(word)
+            self.words.my_words.add(word)
+        else:
+            e.control.bgcolor = self.color_of_not_selected
+            self.words.my_words.remove(word)
+            self.words.new_words.add(word)
+        self.page.update()
+
+    def container_words(self):
+        items = []
+        for i in self.words.new_words:
+            items.append(
+                ft.Container(
+                    ft.Text(i),
+                    width=100,
+                    height=50,
+                    alignment=ft.alignment.center,
+                    bgcolor=ft.colors.AMBER_100,
+                    border=ft.border.all(1, ft.colors.AMBER_400),
+                    border_radius=ft.border_radius.all(5),
+                    on_click=self.click,
+                )
             )
-        )
-    page.update()
+        self.controls = items
 
 
 if __name__ == '__main__':
-    video_id = 'Dn33_uncuzk'
-    words = Words('Max')
-    words.check_from_sub(video_id)
-    ft.app(target=main)
-    words.write_data()
+    ...

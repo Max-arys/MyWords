@@ -5,6 +5,7 @@ from youtube_transcript_api import YouTubeTranscriptApi
 
 
 class Words:
+    """Class has methods write_data() and check_from_sub(video_id: str)"""
 
     def __init__(self, user):
         self.user = user
@@ -36,19 +37,13 @@ class Words:
             json.dump(list(self.my_words), m_w, indent=2)
 
     # Отсеивает знакомые слова в сабах
-    def check_from_sub(self, video_id):
+    def check_from_sub(self, video_id: str):
         for v in YouTubeTranscriptApi.get_transcript(video_id):
             self.new_words.update(
                 re.findall(r'[A-Za-z\']+', v['text'].lower())
-                )
+            )
         self.new_words = self.new_words - self.my_words
 
 
 if __name__ == '__main__':
-    video_id = 'Dn33_uncuzk'
-    words = Words('Max')
-    words.check_from_sub(video_id)
-    print(words.new_words)
-    print('----------------------')
-    print(words.my_words)
-    words.write_data()
+    ...

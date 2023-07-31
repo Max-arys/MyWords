@@ -1,15 +1,20 @@
-import dis
+import atexit
 
-a = ('pen', 'pencil', 'eraser', 'sharpener')
-
-
-def d():
-    return {v: 0 for v in a}
+import flet as ft
 
 
-def d2():
-    return dict.fromkeys(a, 0)
+class GreeterControl(ft.UserControl):
+    def build(self):
+        return ft.Text("Hello!")
+    
+    def pppr(self):
+        print('Exit')
 
 
-dis.dis(d2)
-print(d2())
+def main(page):
+    a = GreeterControl()
+    page.add(a)
+    atexit.register(a.pppr)
+
+
+ft.app(target=main)
