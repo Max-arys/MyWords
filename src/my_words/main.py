@@ -2,7 +2,7 @@ import atexit
 
 import flet as ft
 from interface import Words_chose
-from my_w import Words
+from my_w import Subtitles, Words
 from users import Users
 
 
@@ -10,7 +10,6 @@ def main(page: ft.Page):
     page.title = "My Words"
     users_data = Users()
     user_name = ft.TextField(label="Enter your name")
-    youtube_id = ft.TextField(label="Enter video ID")
 
     if name := users_data.user:
         words = Words(users_data.user)
@@ -40,7 +39,7 @@ def main(page: ft.Page):
             users_data.users.append(name)
             user_name.value = ""
             text_name.content.value = name
-            g_c.disabled = False
+            g_s.disabled = False
             words = Words(users_data.user)
             page.update()
 
@@ -53,20 +52,6 @@ def main(page: ft.Page):
 
     dlg_change = ft.AlertDialog(
         title=ft.Text("Select a profile"),
-        actions_alignment="end",
-    )
-
-    def subtitles(e):
-        page.dialog.open = False
-        words.check_from_sub(youtube_id.value)
-        row_words.container_words()
-        youtube_id.value = ""
-        page.update()
-
-    dlg_subtitles = ft.AlertDialog(
-        title=ft.Text("Enter the video ID"),
-        content=ft.Column([youtube_id], tight=True),
-        actions=[ft.ElevatedButton(text="Get", on_click=subtitles)],
         actions_alignment="end",
     )
 
@@ -100,25 +85,17 @@ def main(page: ft.Page):
         dlg_change.open = True
         page.update()
 
-    def get_subtitles(e):
-        page.dialog = dlg_subtitles
-        dlg_subtitles.open = True
-        page.update()
-
-    r = ft.Row(wrap=True, scroll="always",)
     row_words = Words_chose(words, page)
     row_words.container_words()
-    g_c = ft.ElevatedButton(
-            "Get subtitles",
-            on_click=get_subtitles,
-            disabled=False if users_data.user else True,
-            )
+    g_s = Subtitles(words, page, users_data, row_words)
+
+    r = ft.Row(wrap=True, scroll="always",)
     r.controls.append(text_name)
     r.controls.append(
         ft.ElevatedButton("Create a profile", on_click=create_user))
     r.controls.append(
         ft.ElevatedButton("Change a profile", on_click=change_user))
-    r.controls.append(g_c)
+    r.controls.append(g_s)
     page.add(r)
     page.add(row_words)
 

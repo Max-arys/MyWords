@@ -1,6 +1,7 @@
 import json
 import re
 
+import flet as ft
 from youtube_transcript_api import YouTubeTranscriptApi
 
 
@@ -43,6 +44,38 @@ class Words:
                 re.findall(r'[A-Za-z\']+', v['text'].lower())
             )
         self.new_words = self.new_words - self.my_words
+
+
+class Subtitles(ft.ElevatedButton):
+
+    def __init__(self, words, page, users_data, row_words):
+        self.row_words = row_words
+        self.page = page
+        self.words = words
+        self.users_data = users_data
+        self.youtube_id = ft.TextField(label="Enter video ID")
+        self.dlg_subtitles = ft.AlertDialog(
+            title=ft.Text("Enter the video ID"),
+            content=ft.Column([self.youtube_id], tight=True),
+            actions=[ft.ElevatedButton(text="Get", on_click=self.subtitles)],
+            actions_alignment="end",
+        )
+        super().__init__()
+        self.text = "Get subtitles"
+        self.on_click = self.get_subtitles
+        self.disabled = False if self.users_data.user else True
+
+    def get_subtitles(self, e):
+        self.page.dialog = self.dlg_subtitles
+        self.dlg_subtitles.open = True
+        self.page.update()
+
+    def subtitles(self, e):
+        self.page.dialog.open = False
+        self.words.check_from_sub(self.youtube_id.value)
+        self.row_words.container_words()
+        self.youtube_id.value = ""
+        self.page.update()
 
 
 if __name__ == '__main__':
