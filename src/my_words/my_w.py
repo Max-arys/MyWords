@@ -1,5 +1,6 @@
 import json
 import re
+from typing import Set
 
 import flet as ft
 from youtube_transcript_api import YouTubeTranscriptApi
@@ -8,8 +9,13 @@ from youtube_transcript_api import YouTubeTranscriptApi
 class Words:
     """Class has methods write_data() and check_from_sub(video_id: str)"""
 
-    def __init__(self, user):
+    def __init__(self, user: str):
         self.user = user
+        self.my_words: Set[str] = set()
+        self.new_words: Set[str] = set()
+        self.get_words()
+
+    def get_words(self):
         try:
             with open(
                     rf'MyWords\src\my_words\data\{self.user}_my_worlds.json',
@@ -21,9 +27,8 @@ class Words:
                     'r'
                     ) as n_w:
                 self.new_words = set(json.load(n_w))
-        except FileNotFoundError:
-            self.my_words = set()
-            self.new_words = set()
+        except FileNotFoundError as err:
+            print(err)
 
     def write_data(self):
         # Запись новых слов в nev_words
@@ -46,9 +51,54 @@ class Words:
         self.new_words = self.new_words - self.my_words
 
 
+class Words_chose(ft.Row):
+    color_of_selected = ft.colors.AMBER_500
+    color_of_not_selected = ft.colors.AMBER_100
+
+    def __init__(self, words: Words, page: ft.Page):
+        self.words = words
+        self.page = page
+        super().__init__()
+        self.wrap = True
+        self.scroll = "always"
+        self.expand = True
+        self.click = self.container_click
+
+    def container_click(self, e):
+        word = e.control.content.value
+
+        if e.control.bgcolor == self.color_of_not_selected:
+            e.control.bgcolor = self.color_of_selected
+            self.words.new_words.remove(word)
+            self.words.my_words.add(word)
+        else:
+            e.control.bgcolor = self.color_of_not_selected
+            self.words.my_words.remove(word)
+            self.words.new_words.add(word)
+        self.page.update()
+
+    def container_words(self):
+        items = []
+        for i in self.words.new_words:
+            items.append(
+                ft.Container(
+                    ft.Text(i),
+                    width=100,
+                    height=50,
+                    alignment=ft.alignment.center,
+                    bgcolor=ft.colors.AMBER_100,
+                    border=ft.border.all(1, ft.colors.AMBER_400),
+                    border_radius=ft.border_radius.all(5),
+                    on_click=self.click,
+                )
+            )
+        self.controls = items
+
+
 class Subtitles(ft.ElevatedButton):
 
-    def __init__(self, words, page, users_data, row_words):
+    def __init__(self, words: Words, page: ft.Page, users_data,
+                 row_words: Words_chose):
         self.row_words = row_words
         self.page = page
         self.words = words
@@ -76,7 +126,3 @@ class Subtitles(ft.ElevatedButton):
         self.row_words.container_words()
         self.youtube_id.value = ""
         self.page.update()
-
-
-if __name__ == '__main__':
-    ...
