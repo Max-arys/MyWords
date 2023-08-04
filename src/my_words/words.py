@@ -1,5 +1,6 @@
 import json
 import re
+from pathlib import Path
 from typing import Set
 
 import flet as ft
@@ -7,7 +8,7 @@ from youtube_transcript_api import YouTubeTranscriptApi
 
 
 class Words:
-    """Class has methods write_data() and check_from_sub(video_id: str)"""
+    """Class has methods save_words() and check_from_sub(video_id: str)"""
 
     def __init__(self, user: str):
         self.user = user
@@ -15,35 +16,33 @@ class Words:
         self.new_words: Set[str] = set()
         self.get_words()
 
+    def get_path_my_w(self):
+        return Path(Path.cwd(), 'data', f'{self.user}_my_worlds.json')
+
+    def get_patch_nev_w(self):
+        return Path(Path.cwd(), 'data', f'{self.user}_new_words.json')
+
     def get_words(self):
         try:
-            with open(
-                    rf'MyWords\src\my_words\data\{self.user}_my_worlds.json',
-                    'r'
-                    ) as m_w:
+            with open(self.get_path_my_w(), 'r') as m_w:
                 self.my_words = set(json.load(m_w))
-            with open(
-                    rf'MyWords\src\my_words\data\{self.user}_new_words.json',
-                    'r'
-                    ) as n_w:
+            with open(self.get_patch_nev_w(), 'r') as n_w:
                 self.new_words = set(json.load(n_w))
         except FileNotFoundError as err:
             print(err)
 
-    def write_data(self):
-        # Запись новых слов в nev_words
-        with open(
-                rf'MyWords\src\my_words\data\{self.user}_new_words.json', 'w'
-                ) as n_w:
-            json.dump(list(self.new_words), n_w, indent=2)
-        # Запись новых слов в my_worlds
-        with open(
-                rf'MyWords\src\my_words\data\{self.user}_my_worlds.json', 'w'
-                ) as m_w:
-            json.dump(list(self.my_words), m_w, indent=2)
+    def save_words(self):
+        if self.user:
+            # Запись новых слов в my_worlds
+            with open(self.get_path_my_w(), 'w') as m_w:
+                json.dump(list(self.my_words), m_w, indent=2)
 
-    # Отсеивает знакомые слова в сабах
-    def check_from_sub(self, video_id: str):
+            # Запись новых слов в nev_words
+            with open(self.get_patch_nev_w(), 'w') as n_w:
+                json.dump(list(self.new_words), n_w, indent=2)
+
+    # Отсеивает знакомые слова в сабах check_from_sub
+    def get_words_subs(self, video_id: str):
         for v in YouTubeTranscriptApi.get_transcript(video_id):
             self.new_words.update(
                 re.findall(r'[A-Za-z\']+', v['text'].lower())
@@ -51,9 +50,9 @@ class Words:
         self.new_words = self.new_words - self.my_words
 
 
-class Words_chose(ft.Row):
-    color_of_selected = ft.colors.AMBER_500
-    color_of_not_selected = ft.colors.AMBER_100
+class RowsWords(ft.Row):
+    COLOR_OF_SELECTED = ft.colors.AMBER_500
+    COLOR_OF_NOT_SELECTED = ft.colors.AMBER_100
 
     def __init__(self, words: Words, page: ft.Page):
         self.words = words
@@ -67,17 +66,17 @@ class Words_chose(ft.Row):
     def container_click(self, e):
         word = e.control.content.value
 
-        if e.control.bgcolor == self.color_of_not_selected:
-            e.control.bgcolor = self.color_of_selected
+        if e.control.bgcolor == self.COLOR_OF_NOT_SELECTED:
+            e.control.bgcolor = self.COLOR_OF_SELECTED
             self.words.new_words.remove(word)
             self.words.my_words.add(word)
         else:
-            e.control.bgcolor = self.color_of_not_selected
+            e.control.bgcolor = self.COLOR_OF_NOT_SELECTED
             self.words.my_words.remove(word)
             self.words.new_words.add(word)
         self.page.update()
 
-    def container_words(self):
+    def add_container_words(self):
         items = []
         for i in self.words.new_words:
             items.append(
@@ -98,8 +97,8 @@ class Words_chose(ft.Row):
 class Subtitles(ft.ElevatedButton):
 
     def __init__(self, words: Words, page: ft.Page, users_data,
-                 row_words: Words_chose):
-        self.row_words = row_words
+                 rows_words: RowsWords):
+        self.rows_words = rows_words
         self.page = page
         self.words = words
         self.users_data = users_data
@@ -107,22 +106,23 @@ class Subtitles(ft.ElevatedButton):
         self.dlg_subtitles = ft.AlertDialog(
             title=ft.Text("Enter the video ID"),
             content=ft.Column([self.youtube_id], tight=True),
-            actions=[ft.ElevatedButton(text="Get", on_click=self.subtitles)],
+            actions=[ft.ElevatedButton(
+                text="Get", on_click=self.get_subtitles)],
             actions_alignment="end",
         )
         super().__init__()
         self.text = "Get subtitles"
-        self.on_click = self.get_subtitles
+        self.on_click = self.click_sub
         self.disabled = False if self.users_data.user else True
 
-    def get_subtitles(self, e):
+    def click_sub(self, e):
         self.page.dialog = self.dlg_subtitles
         self.dlg_subtitles.open = True
         self.page.update()
 
-    def subtitles(self, e):
+    def get_subtitles(self, e):
         self.page.dialog.open = False
-        self.words.check_from_sub(self.youtube_id.value)
-        self.row_words.container_words()
+        self.words.get_words_subs(self.youtube_id.value)
+        self.rows_words.add_container_words()
         self.youtube_id.value = ""
         self.page.update()

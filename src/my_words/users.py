@@ -1,18 +1,29 @@
 import json
+from pathlib import Path
 
 import flet as ft
-from my_w import Subtitles, Words, Words_chose
+from words import RowsWords, Subtitles, Words
+
+dir_path = Path.cwd()
+file_path = Path(dir_path, 'data', 'users.json')
+file_path = r'data\users.json'
 
 
 class Users:
     def __init__(self):
-        with open(r'MyWords\src\my_words\data\users.json', 'r') as u:
-            self.d_users = json.load(u)
+        self.d_users = self.get_users()
         self.users = self.d_users["users"]
         self.user = self.d_users["user"]
 
-    def save_data(self):
-        with open(r'MyWords\src\my_words\data\users.json', 'w') as u:
+    def get_users(self):
+        try:
+            with open(file_path, 'r') as u:
+                return json.load(u)
+        except FileNotFoundError:
+            return {"user": "", "users": []}
+
+    def save_users(self):
+        with open(file_path, 'w') as u:
             self.d_users["users"] = self.users
             self.d_users["user"] = self.user
             json.dump(self.d_users, u)
@@ -42,19 +53,20 @@ class BottomCreate(ft.ElevatedButton):
         self.dlg_create = ft.AlertDialog(
             title=ft.Text("Welcome!"),
             content=ft.Column([self.user_name], tight=True),
-            actions=[ft.ElevatedButton(text="Create", on_click=self.create)],
+            actions=[ft.ElevatedButton(
+                text="Create", on_click=self.create_user)],
             actions_alignment="end",
         )
         super().__init__()
         self.text = "Create a profile"
-        self.on_click = self.create_user
+        self.on_click = self.click_create_user
 
-    def create_user(self, e):
+    def click_create_user(self, e):
         self.page.dialog = self.dlg_create
         self.dlg_create.open = True
         self.page.update()
 
-    def create(self, e):
+    def create_user(self, e):
         if not self.user_name.value:
             self.user_name.error_text = "Name cannot be blank!"
             self.user_name.update()
@@ -70,7 +82,7 @@ class BottomCreate(ft.ElevatedButton):
             self.text_name.content.value = name
             self.g_s.disabled = False
             if self.words.user:
-                self.words.write_data()
+                self.words.save_words()
             self.words.user = self.users_data.user
             self.page.update()
 
@@ -78,9 +90,9 @@ class BottomCreate(ft.ElevatedButton):
 class BottomChange(ft.ElevatedButton):
 
     def __init__(self, page: ft.Page, users_data: Users, text_name: NameBadge,
-                 row_words: Words_chose, words: Words):
+                 rows_words: RowsWords, words: Words):
         self.words = words
-        self.row_words = row_words
+        self.rows_words = rows_words
         self.text_name = text_name
         self.users_data = users_data
         self.page = page
@@ -90,28 +102,28 @@ class BottomChange(ft.ElevatedButton):
         )
         super().__init__()
         self.text = "Change a profile"
-        self.on_click = self.change_user
+        self.on_click = self.click_change_user
 
-    def change_user(self, e):
+    def click_change_user(self, e):
         self.page.dialog = self.dlg_change
         self.dlg_change.actions = [ft.Dropdown(
                 width=100,
                 options=[ft.dropdown.Option(v) for v in self.users_data.users]
                 ),
-            ft.ElevatedButton(text="Change", on_click=self.change)
+            ft.ElevatedButton(text="Change", on_click=self.change_user)
         ]
         self.dlg_change.open = True
         self.page.update()
 
-    def change(self, e):
+    def change_user(self, e):
         name = self.dlg_change.actions[0].value
         if name:
             self.users_data.user = name
             self.text_name.content.value = name
             self.dlg_change.open = False
-            self.words.write_data()
+            self.words.save_words()
             self.words.user = self.users_data.user
             self.words.get_words()
-            self.row_words.words = self.words
-            self.row_words.container_words()
+            self.rows_words.words = self.words
+            self.rows_words.add_container_words()
             self.page.update()
