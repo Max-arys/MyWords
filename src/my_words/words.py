@@ -4,7 +4,9 @@ from pathlib import Path
 from typing import Set
 
 import flet as ft
-from youtube_transcript_api import YouTubeTranscriptApi
+from requests.exceptions import ConnectionError
+from setings import WORK_DIR
+from youtube_transcript_api import YouTubeTranscriptApi, _errors
 
 
 class Words:
@@ -16,11 +18,11 @@ class Words:
         self.new_words: Set[str] = set()
         self.get_words()
 
-    def get_path_my_w(self):
-        return Path(Path.cwd(), 'data', f'{self.user}_my_worlds.json')
+    def get_path_my_w(self) -> Path:
+        return WORK_DIR.joinpath('data', f'{self.user}_my_worlds.json')
 
-    def get_patch_nev_w(self):
-        return Path(Path.cwd(), 'data', f'{self.user}_new_words.json')
+    def get_patch_nev_w(self) -> Path:
+        return WORK_DIR.joinpath('data', f'{self.user}_new_worlds.json')
 
     def get_words(self):
         try:
@@ -28,8 +30,8 @@ class Words:
                 self.my_words = set(json.load(m_w))
             with open(self.get_patch_nev_w(), 'r') as n_w:
                 self.new_words = set(json.load(n_w))
-        except FileNotFoundError as err:
-            print(err)
+        except FileNotFoundError:
+            pass
 
     def save_words(self):
         if self.user:
@@ -121,8 +123,15 @@ class Subtitles(ft.ElevatedButton):
         self.page.update()
 
     def get_subtitles(self, e):
-        self.page.dialog.open = False
-        self.words.get_words_subs(self.youtube_id.value)
-        self.rows_words.add_container_words()
-        self.youtube_id.value = ""
-        self.page.update()
+        try:
+            self.words.get_words_subs(self.youtube_id.value)
+            self.page.dialog.open = False
+            self.rows_words.add_container_words()
+            self.youtube_id.value = ""
+            self.page.update()
+        except _errors.TranscriptsDisabled:
+            self.youtube_id.error_text = "Incorrect video id"
+            self.youtube_id.update()
+        except ConnectionError:
+            self.youtube_id.error_text = "ConnectionError"
+            self.youtube_id.update()

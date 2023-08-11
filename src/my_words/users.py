@@ -1,32 +1,33 @@
 import json
-from pathlib import Path
+from typing import List
 
 import flet as ft
+from setings import USERS_FILE
 from words import RowsWords, Subtitles, Words
-
-dir_path = Path.cwd()
-file_path = Path(dir_path, 'data', 'users.json')
-file_path = r'data\users.json'
 
 
 class Users:
     def __init__(self):
-        self.d_users = self.get_users()
-        self.users = self.d_users["users"]
-        self.user = self.d_users["user"]
+        self.user: str = None
+        self.users: List[str] = None
+        self.get_users()
 
     def get_users(self):
         try:
-            with open(file_path, 'r') as u:
-                return json.load(u)
+            with open(USERS_FILE, 'r') as u:
+                d_users = json.load(u)
+                self.user = d_users["user"]
+                self.users = d_users["users"]
         except FileNotFoundError:
-            return {"user": "", "users": []}
+            self.user = ""
+            self.users = []
 
     def save_users(self):
-        with open(file_path, 'w') as u:
-            self.d_users["users"] = self.users
-            self.d_users["user"] = self.user
-            json.dump(self.d_users, u)
+        with open(USERS_FILE, 'w') as u:
+            d_users = {}
+            d_users["user"] = self.user
+            d_users["users"] = self.users
+            json.dump(d_users, u)
 
 
 class NameBadge(ft.Container):
