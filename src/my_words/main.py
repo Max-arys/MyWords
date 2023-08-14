@@ -1,4 +1,5 @@
 import atexit
+import logging
 
 import flet as ft
 from users import BottomChange, BottomCreate, NameBadge, Users
@@ -18,7 +19,7 @@ def main(page: ft.Page):
     r = ft.Row(wrap=True, scroll="always")
     r.controls.append(text_name)
     r.controls.append(
-        BottomCreate(page, users_data, g_s, text_name, words))
+        BottomCreate(page, users_data, g_s, text_name, rows_words, words))
     r.controls.append(
         BottomChange(page, users_data, text_name, rows_words, words))
     r.controls.append(g_s)
@@ -30,4 +31,5 @@ def main(page: ft.Page):
 
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.WARNING)
     ft.app(target=main)

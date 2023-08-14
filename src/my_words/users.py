@@ -44,8 +44,9 @@ class NameBadge(ft.Container):
 class BottomCreate(ft.ElevatedButton):
 
     def __init__(self, page: ft.Page, users_data: Users, g_s: Subtitles,
-                 text_name: NameBadge, words: Words):
+                 text_name: NameBadge, rows_words: RowsWords, words: Words):
         self.words = words
+        self.rows_words = rows_words
         self.text_name = text_name
         self.g_s = g_s
         self.users_data = users_data
@@ -82,9 +83,7 @@ class BottomCreate(ft.ElevatedButton):
             self.user_name.value = ""
             self.text_name.content.value = name
             self.g_s.disabled = False
-            if self.words.user:
-                self.words.save_words()
-            self.words.user = self.users_data.user
+            self.rows_words.refresh_row_words(name)
             self.page.update()
 
 
@@ -122,9 +121,5 @@ class BottomChange(ft.ElevatedButton):
             self.users_data.user = name
             self.text_name.content.value = name
             self.dlg_change.open = False
-            self.words.save_words()
-            self.words.user = self.users_data.user
-            self.words.get_words()
-            self.rows_words.words = self.words
-            self.rows_words.add_container_words()
+            self.rows_words.refresh_row_words(name)
             self.page.update()

@@ -14,8 +14,8 @@ class Words:
 
     def __init__(self, user: str):
         self.user = user
-        self.my_words: Set[str] = set()
-        self.new_words: Set[str] = set()
+        self.my_words: Set[str] = None
+        self.new_words: Set[str] = None
         self.get_words()
 
     def get_path_my_w(self) -> Path:
@@ -31,7 +31,8 @@ class Words:
             with open(self.get_patch_nev_w(), 'r') as n_w:
                 self.new_words = set(json.load(n_w))
         except FileNotFoundError:
-            pass
+            self.my_words = set()
+            self.new_words = set()
 
     def save_words(self):
         if self.user:
@@ -95,6 +96,13 @@ class RowsWords(ft.Row):
             )
         self.controls = items
 
+    def refresh_row_words(self, user: str):
+        if self.words.user:
+            self.words.save_words()
+        self.words.user = user
+        self.words.get_words()
+        self.add_container_words()
+
 
 class Subtitles(ft.ElevatedButton):
 
@@ -128,10 +136,11 @@ class Subtitles(ft.ElevatedButton):
             self.page.dialog.open = False
             self.rows_words.add_container_words()
             self.youtube_id.value = ""
-            self.page.update()
         except _errors.TranscriptsDisabled:
             self.youtube_id.error_text = "Incorrect video id"
-            self.youtube_id.update()
         except ConnectionError:
             self.youtube_id.error_text = "ConnectionError"
+        except _errors.NoTranscriptFound:
+            self.youtube_id.error_text = "English subtitles not found"
+        finally:
             self.youtube_id.update()
