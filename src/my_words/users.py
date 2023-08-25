@@ -1,9 +1,13 @@
 import json
+import logging.config
 from typing import List
 
 import flet as ft
-from setings import USERS_FILE
+from setings import LOGGING_CONFIG, USERS_FILE
 from words import RowsWords, Subtitles, Words
+
+logging.config.dictConfig(LOGGING_CONFIG)
+logger = logging.getLogger(__name__)
 
 
 class Users:

@@ -1,12 +1,16 @@
 import json
+import logging.config
 import re
 from pathlib import Path
 from typing import Set
 
 import flet as ft
 from requests.exceptions import ConnectionError
-from setings import WORK_DIR
+from setings import DATA_DIR, LOGGING_CONFIG
 from youtube_transcript_api import YouTubeTranscriptApi, _errors
+
+logging.config.dictConfig(LOGGING_CONFIG)
+logger = logging.getLogger(__name__)
 
 
 class Words:
@@ -19,10 +23,10 @@ class Words:
         self.get_words()
 
     def get_path_my_w(self) -> Path:
-        return WORK_DIR.joinpath('data', f'{self.user}_my_worlds.json')
+        return DATA_DIR.joinpath(f'{self.user}_my_worlds.json')
 
     def get_patch_nev_w(self) -> Path:
-        return WORK_DIR.joinpath('data', f'{self.user}_new_worlds.json')
+        return DATA_DIR.joinpath(f'{self.user}_new_worlds.json')
 
     def get_words(self):
         try:
@@ -138,9 +142,12 @@ class Subtitles(ft.ElevatedButton):
             self.youtube_id.value = ""
         except _errors.TranscriptsDisabled:
             self.youtube_id.error_text = "Incorrect video id"
+            logger.warning(f"Incorrect video id: {self.youtube_id.value}")
         except ConnectionError:
             self.youtube_id.error_text = "ConnectionError"
+            logger.warning("ConnectionError")
         except _errors.NoTranscriptFound:
             self.youtube_id.error_text = "English subtitles not found"
+            logger.warning("English subtitles not found")
         finally:
             self.youtube_id.update()

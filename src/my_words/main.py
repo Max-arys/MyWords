@@ -1,12 +1,17 @@
 import atexit
-import logging
+import logging.config
 
 import flet as ft
+from setings import LOGGING_CONFIG
 from users import BottomChange, BottomCreate, NameBadge, Users
 from words import RowsWords, Subtitles, Words
 
+logging.config.dictConfig(LOGGING_CONFIG)
+logger = logging.getLogger('my_words')
+
 
 def main(page: ft.Page):
+    logger.info('session start')
     page.title = "My Words"
     users_data = Users()
     words = Words(users_data.user)
@@ -26,10 +31,10 @@ def main(page: ft.Page):
     page.add(r)
     page.add(rows_words)
 
+    logger.info('session end')
     atexit.register(words.save_words)
     atexit.register(users_data.save_users)
 
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.WARNING)
     ft.app(target=main)
