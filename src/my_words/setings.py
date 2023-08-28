@@ -2,9 +2,9 @@ from pathlib import Path
 
 WORK_DIR = Path(__file__).resolve().parent
 BASE_DIR = WORK_DIR.parent.parent
+DATA_DIR = WORK_DIR.joinpath('data')
 USERS_FILE = WORK_DIR.joinpath('data', 'users.json')
 LOGS_FILE = WORK_DIR.joinpath('logs', 'log.log')
-DATA_DIR = WORK_DIR.joinpath('data')
 
 LOGGING_CONFIG = {
     "version": 1,

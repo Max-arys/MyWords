@@ -35,6 +35,7 @@ class Users:
 
 
 class NameBadge(ft.Container):
+    """A class for displaying the user's badge."""
 
     def __init__(self, name: str):
         self.name = name
@@ -45,7 +46,7 @@ class NameBadge(ft.Container):
         self.border_radius = ft.border_radius.all(5)
 
 
-class BottomCreate(ft.ElevatedButton):
+class BottomCreateUser(ft.ElevatedButton):
 
     def __init__(self, page: ft.Page, users_data: Users, g_s: Subtitles,
                  text_name: NameBadge, rows_words: RowsWords, words: Words):

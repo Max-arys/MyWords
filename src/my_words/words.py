@@ -14,7 +14,6 @@ logger = logging.getLogger(__name__)
 
 
 class Words:
-    """Class has methods save_words() and check_from_sub(video_id: str)"""
 
     def __init__(self, user: str):
         self.user = user
@@ -23,12 +22,18 @@ class Words:
         self.get_words()
 
     def get_path_my_w(self) -> Path:
+        """Return the path to the user's learned words."""
         return DATA_DIR.joinpath(f'{self.user}_my_worlds.json')
 
     def get_patch_nev_w(self) -> Path:
+        """Return the path to the user's unexplored words."""
         return DATA_DIR.joinpath(f'{self.user}_new_worlds.json')
 
     def get_words(self):
+        """Create two sets containing learned and unlearned
+        words loaded from the database, if the database does
+        not have these sets, create new ones.
+        """
         try:
             with open(self.get_path_my_w(), 'r') as m_w:
                 self.my_words = set(json.load(m_w))
@@ -39,6 +44,7 @@ class Words:
             self.new_words = set()
 
     def save_words(self):
+        """Save words in json format."""
         if self.user:
             # Запись новых слов в my_worlds
             with open(self.get_path_my_w(), 'w') as m_w:
@@ -50,6 +56,7 @@ class Words:
 
     # Отсеивает знакомые слова в сабах check_from_sub
     def get_words_subs(self, video_id: str):
+        """Filter out familiar words in subtitles, leaving only new ones."""
         for v in YouTubeTranscriptApi.get_transcript(video_id):
             self.new_words.update(
                 re.findall(r'[A-Za-z\']+', v['text'].lower())
@@ -71,8 +78,8 @@ class RowsWords(ft.Row):
         self.click = self.container_click
 
     def container_click(self, e):
+        """Mark words as familiar or unfamiliar."""
         word = e.control.content.value
-
         if e.control.bgcolor == self.COLOR_OF_NOT_SELECTED:
             e.control.bgcolor = self.COLOR_OF_SELECTED
             self.words.new_words.remove(word)
@@ -84,6 +91,7 @@ class RowsWords(ft.Row):
         self.page.update()
 
     def add_container_words(self):
+        """Add new words to the page."""
         items = []
         for i in self.words.new_words:
             items.append(
@@ -101,6 +109,7 @@ class RowsWords(ft.Row):
         self.controls = items
 
     def refresh_row_words(self, user: str):
+        """Update the words on the page."""
         if self.words.user:
             self.words.save_words()
         self.words.user = user
@@ -130,6 +139,7 @@ class Subtitles(ft.ElevatedButton):
         self.disabled = False if self.users_data.user else True
 
     def click_sub(self, e):
+        """Open the window for adding subtitles."""
         self.page.dialog = self.dlg_subtitles
         self.dlg_subtitles.open = True
         self.page.update()

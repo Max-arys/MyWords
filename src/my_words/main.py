@@ -3,7 +3,7 @@ import logging.config
 
 import flet as ft
 from setings import LOGGING_CONFIG
-from users import BottomChange, BottomCreate, NameBadge, Users
+from users import BottomChange, BottomCreateUser, NameBadge, Users
 from words import RowsWords, Subtitles, Words
 
 logging.config.dictConfig(LOGGING_CONFIG)
@@ -24,14 +24,14 @@ def main(page: ft.Page):
     r = ft.Row(wrap=True, scroll="always")
     r.controls.append(text_name)
     r.controls.append(
-        BottomCreate(page, users_data, g_s, text_name, rows_words, words))
+        BottomCreateUser(page, users_data, g_s, text_name, rows_words, words))
     r.controls.append(
         BottomChange(page, users_data, text_name, rows_words, words))
     r.controls.append(g_s)
     page.add(r)
     page.add(rows_words)
 
-    logger.info('session end')
+    atexit.register(logger.info, 'session end')
     atexit.register(words.save_words)
     atexit.register(users_data.save_users)
 
