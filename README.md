@@ -1,6 +1,6 @@
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="imadges\logo4.png">
-  <img alt="NebulaGraph Data Intelligence Suite(ngdi)" src="imadges\logo4.png">
+  <source media="(prefers-color-scheme: dark)" srcset="imadges\logo2.png">
+  <img alt="NebulaGraph Data Intelligence Suite(ngdi)" src="imadges\logo2.png">
 </picture>
 
 ![License](https://img.shields.io/github/license/Max-arys/REP_MAX_calculator?logoColor=red)
