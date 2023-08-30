@@ -2,7 +2,7 @@ import atexit
 import logging.config
 
 import flet as ft
-from setings import LOGGING_CONFIG
+from setings import COLOR_PAGE, LOGGING_CONFIG
 from users import BottomChange, BottomCreateUser, NameBadge, Users
 from words import RowsWords, Subtitles, Words
 
@@ -12,6 +12,7 @@ logger = logging.getLogger('my_words')
 
 def main(page: ft.Page):
     logger.info('session start')
+    page.bgcolor = COLOR_PAGE
     page.title = "My Words"
     users_data = Users()
     words = Words(users_data.user)

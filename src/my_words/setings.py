@@ -6,6 +6,8 @@ DATA_DIR = WORK_DIR.joinpath('data')
 USERS_FILE = WORK_DIR.joinpath('data', 'users.json')
 LOGS_FILE = WORK_DIR.joinpath('logs', 'log.log')
 
+COLOR_PAGE = None
+
 LOGGING_CONFIG = {
     "version": 1,
     "disable_existing_loggers": True,
