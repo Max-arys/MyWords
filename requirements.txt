@@ -1,2 +1,2 @@
-youtube-transcript-api==0.6.1
-flet==0.8.4
+youtube-transcript-api==0.6.2
+flet==0.22.1
