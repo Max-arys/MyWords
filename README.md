@@ -6,19 +6,27 @@
 ![License](https://img.shields.io/github/license/Max-arys/REP_MAX_calculator?logoColor=red)
 # MyWord
 ### Описание
-Этот проект может многое.
+Этот проект создан для помощи в изучении иностранных языков
 ### Технологии
 Python 3.7
 Django 2.2.19
 ### Запуск проекта в dev-режиме
 - Установите и активируйте виртуальное окружение
+```
+python -m venv venv
+venv\Scripts\activate - для Windows;
+source venv/bin/activate - для Linux и MacOS.
+```
 - Установите зависимости из файла requirements.txt
 ```
 pip install -r requirements.txt
 ```
-- В папке с файлом manage.py выполните команду:
+- Запустите файл main.py
 ```
-python3 manage.py runserver
+py main.py
 ```
+Для добавления слов из субтитров введите id видео 
+
+https://www.youtube.com/watch?v=WlPTmXi0pVk >> WlPTmXi0pVk
 ### Авторы
-Андрей, Стёпа, Лера и Максим
+Arys
