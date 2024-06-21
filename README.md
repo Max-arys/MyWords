@@ -13,20 +13,24 @@ Django 2.2.19
 ### Запуск проекта в dev-режиме
 - Установите и активируйте виртуальное окружение
 
-```python
+```bash
 python -m venv venv
 venv\Scripts\activate - для Windows;
 source venv/bin/activate - для Linux и MacOS.
 ```
 
 - Установите зависимости из файла requirements.txt
-```
+
+```bash
 pip install -r requirements.txt
 ```
+
 - Запустите файл main.py
-```
+
+```bash
 py main.py
 ```
+
 Для добавления слов из субтитров введите id видео 
 
 https://www.youtube.com/watch?v=WlPTmXi0pVk >> WlPTmXi0pVk
